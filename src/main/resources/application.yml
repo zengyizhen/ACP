@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: coursework1
+  datasource:
+    url: ${ACP_POSTGRES}
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+info:
+  app:
+    name: coursework1
+    description: This is the ACP coursework1 Rest Service
+    version: 1.0
+
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+logging:
+  level:
+    web: debug
+
+springdoc:
+  api-docs:
+    enabled: true
+
+server:
+  port: 8080
+
+
+# ilp-endpoint: https://ilp-rest-2025-all-assigned.azurewebsites.net/ABC
