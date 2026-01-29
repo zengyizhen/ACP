@@ -1,14 +1,15 @@
 # 接口开发记录文档
-| 接口方法 | 接口路径 | 完成状态 |
-|----------|----------|----------|
-| GET | /all/s3/{bucket} | ❌ 未完成 |
-| GET | /single/s3/{bucket}/{key} | ❌ 未完成 |
-| GET | /all/dynamo/{table} | ❌ 未完成 |
-| GET | /single/dynamo/{table}/{key} | ❌ 未完成 |
-| GET | /all/postgres/{table} | ✅ 已完成 |
-| POST | /process/dump | ✅ 已完成 |
-| POST | /copy-content/dynamo/{table} | ❌ 未完成 |
-| POST | /copy-content/S3/{table} | ❌ 未完成 |
+| 接口方法 | 接口路径                         | 完成状态               |
+|----------|------------------------------|--------------------|
+| GET | /all/s3/{bucket}             | ❌ 未完成              |
+| GET | /single/s3/{bucket}/{key}    | ❌ 未完成              |
+| GET | /all/dynamo/{table}          | ❌ 未完成              |
+| GET | /single/dynamo/{table}/{key} | ❌ 未完成              |
+| GET | /all/postgres/{table}        | ✅ 已完成              |
+| POST | /process/dump                | ✅ 已完成 保存到s3和dynamo |
+| POST | /process/postgres/{table}    | ✅ 已完成              |
+| POST | /copy-content/dynamo/{table} | ❌ 未完成              |
+| POST | /copy-content/S3/{table}     | ❌ 未完成              |
 ## 一、项目整体架构
 | 层级          | 作用                                                                 | 对应示例代码文件                                  |
 |---------------|----------------------------------------------------------------------|-------------------------------------------|
@@ -53,7 +54,30 @@
    - 调用 **[IlpService.fetchDrones()](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/service/IlpService.java#L17-L25)** 从远程URL获取无人机数据
    - 再调用 **[CostCalculator.costPer100Moves()](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/util/CostCalculator.java#L12-L41)** 计算100次移动成本
 4. 返回包含 `costPer100Moves` 字段的处理后数据
+5. 存储到S3和DynamoDB（此部分逻辑未实现）
+6. 返回处理结果 http响应
 
 ### 核心处理逻辑
 - **[IlpService.fetchDrones()](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/service/IlpService.java#L17-L25)**: 通过 [RestTemplate](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/config/RestTemplateConfig.java#L10-L10) 发送GET请求获取远程数据
 - **[CostCalculator.costPer100Moves()](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/util/CostCalculator.java#L12-L41)**: 遍历数据计算 `costPer100Moves = costInitial + costFinal + (costPerMove * 100)`
+
+## POST /api/v1/acp/process/postgres/{table} 接口逻辑
+# POST /api/v1/acp/process/postgres/{table} 接口逻辑
+
+### 整体流程
+`Controller层` → `Service层` → [IlpService](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/service/IlpService.java#L12-L60) → `Util层` → 数据库操作 → 返回结果
+
+### 具体调用链路
+
+1. **[PostgresController.InsertPostgresData()](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/controller/PostgresController.java#L20-L23)** 接收URL路径参数 `{table}` 和请求体
+2. 提取请求体中的 `urlPath` 参数，传入 **[PostgresService.insertDataFromILPToPostgres()](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/service/PostgresService.java#L27-L34)**
+3. [PostgresService](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/service/PostgresService.java#L7-L34) 内部：
+   - 调用 **[IlpService.fetchDronesPlain()](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/service/IlpService.java#L27-L48)** 从远程URL获取扁平化的无人机数据
+   - 调用 **[PostgresTableUtil.insertDataIntoTable()](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/util/PostgresTableUtil.java#L30-L58)** 将数据插入到指定表中
+4. 返回 `ResponseEntity` 响应对象
+
+## 核心处理逻辑
+
+- **[IlpService.fetchDronesPlain()](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/service/IlpService.java#L27-L48)**: 通过 [RestTemplate](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/config/RestTemplateConfig.java#L10-L10) 发送GET请求获取远程数据并扁平化处理
+- **[PostgresTableUtil.insertDataIntoTable()](file:///Users/olivia/IdeaProjects/coursework1/src/main/java/org/example/coursework1/util/PostgresTableUtil.java#L30-L58)**: 逐条处理数据，检查主键是否存在，存在则更新，否则插入新记录
+

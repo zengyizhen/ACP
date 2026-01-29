@@ -31,7 +31,6 @@ docker run --name acp-postgres \
 -p 5432:5432 \
 -d postgres:15
 2. 通过容器进入数据库
-
 psql -h localhost -U postgres -d acp
 3. 创建schema(SID
 
@@ -43,19 +42,16 @@ id VARCHAR,
 cooling BOOLEAN,
 heating BOOLEAN,
 capacity INTEGER,
-max_moves INTEGER,
-cost_per_move DOUBLE PRECISION,
-cost_initial DOUBLE PRECISION,
-cost_final DOUBLE PRECISION,
-cost_per_100_moves DOUBLE PRECISION
+maxMoves INTEGER,
+costPerMove DOUBLE PRECISION,
+costInitial DOUBLE PRECISION,
+costFinal DOUBLE PRECISION
 );
 
 4. 插入测试数据
 INSERT INTO drones
-(name, id, cooling, heating, capacity, max_moves,
-cost_per_move, cost_initial, cost_final, cost_per_100_moves)
-VALUES
-('Drone1', '1', true, true, 4, 2000, 0.01, 4.3, 6.5, 11.8);
+(name, id, cooling, heating, capacity, maxMoves, costPerMove, costInitial, costFinal)
+VALUES('Drone0', '0', true, true, 4, 2000, 0.01, 4.3, 6.5);
 
 ###  服务端连接Postgres数据库：
 配置文件application.yml中添加：  

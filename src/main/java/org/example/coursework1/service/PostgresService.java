@@ -15,6 +15,8 @@ public class PostgresService {
     @Autowired
     private PostgresTableUtil postgresTableUtil;
 
+    @Autowired
+    private IlpService ilpService;
     /**
      * 获取表中所有数据并返回响应对象
      */
@@ -32,7 +34,25 @@ public class PostgresService {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 数据库错误返回 500
         }
     }
+    /*从ILP获取数据并 插入到Postgres数据库中*/
+    public ResponseEntity<List<Map<String, Object>>> insertDataFromILPToPostgres(String tableName,String urlPath) {
+        try {
+            List<Map<String, Object>> drones = ilpService.fetchDronesPlain(urlPath);
 
+            // 插入数据到数据库
+            boolean success = postgresTableUtil.insertDataIntoTable(tableName, drones);
+
+            if (success) {
+                return new ResponseEntity<>(drones, HttpStatus.OK); // 成功返回 200 和数据
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 数据库错误返回 500
+        }
+
+    }
     private boolean isValidTableName(String tableName) {
         return tableName != null && tableName.matches("^[a-zA-Z_][a-zA-Z0-9_]*$");
     }
