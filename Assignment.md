@@ -1,4 +1,4 @@
-# ACP Assignment 1 开发文档模板
+# ACP Assignment 1
 **项目名称**：ACP Assignment 1 - Java REST Service with Cloud Integration
 
 ## 一、 项目概述
@@ -150,7 +150,3 @@ acp_submission_1/
 3.  环境变量不可硬编码在代码中，需通过 Spring Boot 配置文件占位符获取。
 4.  提交前需验证 tar 镜像可正常加载、容器可正常运行、接口功能符合要求。
 5.  Piazza 提问需在截止日期前 3 天完成，避免临时问题无法解答。
-
----
-
-要不要我帮你基于这个模板，生成一份**可直接填充的空白开发文档**，把需要手动填写的部分用标记标出来？

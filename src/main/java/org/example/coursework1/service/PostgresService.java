@@ -29,7 +29,7 @@ public class PostgresService {
             List<Map<String, Object>> data = postgresTableUtil.getAllTableData(tableName);
             return new ResponseEntity<>(data, HttpStatus.OK); // 成功返回 200 和数据
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // 数据库错误返回 500
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // 数据库错误返回 500
         }
     }
 

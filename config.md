@@ -68,11 +68,3 @@ jpa:
     show-sql: true
     hibernate:
         ddl-auto: none
-
-### 实现API： GET all/postgres/{table}
-| 接口方法 | 接口路径 | 请求参数 | 响应数据 | 业务逻辑 |
-| --- | --- | --- | --- | --- |
-| GET | /all/postgres/{table} | 参数：table（Postgres 表名） | JSON 数组：表内所有行数据 | 读取 Postgres 表内全部行，转为 JSON 对象列表 |
-
-
-
