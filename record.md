@@ -33,7 +33,7 @@ docker run --name acp-postgres \
 2. 通过容器进入数据库
 
 psql -h localhost -U postgres -d acp
-3. 创建schema(SID)
+3. 创建schema(SID
 
 CREATE SCHEMA s2807348;
 SET search_path To s2807348;
